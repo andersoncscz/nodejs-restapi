@@ -11,12 +11,8 @@ class ModelRouter extends router_1.Router {
         this.prepareOne = (query) => {
             return query;
         };
-        this.validateId = (req, res, next) => {
-            if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-                return next(new restify_errors_1.NotFoundError('Document not found'));
-            }
-            next();
-        };
+        //Validates ids
+        this.validateId = (req, res, next) => !mongoose.Types.ObjectId.isValid(req.params.id) ? next(new restify_errors_1.NotFoundError('Document not found')) : next();
         this.find = (req, res, next) => {
             //Controls the pagination
             let page = parseInt(req.query._page || 1);
@@ -45,17 +41,15 @@ class ModelRouter extends router_1.Router {
             const where = { _id: req.params.id };
             const options = { overwrite: true, runValidators: true, };
             this.model.update(where, req.body, options).exec()
-                .then(result => {
-                if (result.n)
-                    return this.model.findById(req.params.id);
-                throw new restify_errors_1.NotFoundError('Document not found');
-            })
+                .then(() => this.model.findById(req.params.id))
                 .then(this.render(res, next))
                 .catch(next);
         };
         this.update = (req, res, next) => {
-            const options = { new: true, runValidators: true, };
-            this.model.findOneAndUpdate(req.params.id, req.body, options)
+            const where = { _id: req.params.id };
+            const options = { runValidators: true, new: true };
+            this.model.findOneAndUpdate(where, req.body, options)
+                .then(() => this.model.findById(req.params.id))
                 .then(this.render(res, next))
                 .catch(next);
         };

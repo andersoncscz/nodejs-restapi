@@ -17,7 +17,6 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     }
 
     envelope(document: any): any {
-        
         return Object.assign({
             _links: {
                 self: `${this.basePath}/${document._id}`
@@ -57,12 +56,8 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     }
 
 
-    validateId = (req, res, next) => {
-        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-            return next(new NotFoundError('Document not found'));
-        }
-        next();
-    }
+    //Validates ids
+    validateId = (req, res, next) => !mongoose.Types.ObjectId.isValid(req.params.id) ? next(new NotFoundError('Document not found')) : next();
 
 
     find = (req, res, next) => {
@@ -85,15 +80,17 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         this.prepareOne(this.model.findById(req.params.id))
             .then(this.render(res, next))
             .catch(next);
-    };
+    }
 
 
     save = (req, res, next) => {
+        
         const document = new this.model(req.body);
+
         document.save()
             .then(this.render(res, next))
             .catch(next);
-    };
+    }
 
     replace = (req, res, next) => {
             
@@ -101,23 +98,21 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         const options = { overwrite: true, runValidators: true, }
         
         this.model.update(where, req.body, options).exec()
-            .then(result => {
-                if (result.n)
-                    return this.model.findById(req.params.id);
-
-                throw new NotFoundError('Document not found');
-            })
+            .then(() => this.model.findById(req.params.id))
             .then(this.render(res, next))
             .catch(next);
     }
 
     update = (req, res, next) => {
-            
-        const options = { new: true, runValidators: true, }
-
-        this.model.findOneAndUpdate(req.params.id, req.body, options)
+        
+        const where = { _id: req.params.id }
+        const options = {runValidators: true, new : true}
+       
+        this.model.findOneAndUpdate(where, req.body, options)
+            .then(() => this.model.findById(req.params.id))
             .then(this.render(res, next))
-            .catch(next);
+            .catch(next);   
+         
     }
 
     delete = (req, res, next) => {
