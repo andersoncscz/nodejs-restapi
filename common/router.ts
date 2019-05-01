@@ -6,12 +6,23 @@ export abstract class Router extends EventEmitter {
     
     abstract applyRoutes(application: restify.Server);
     
+
+    envelope(document: any): any {
+        return document;
+    }
+
+
+    envelopAll(documents: any[], options: any = {}): any {
+        return documents;
+    }
+
+
     //Callback function to render successful responses
     render = (res: restify.Response, next: restify.Next) => {
         return (document) => {
             if (document) {
                 this.emit('beforeRender', document);
-                res.json(document);
+                res.json(this.envelope(document));
             } 
             else {
                 throw new NotFoundError('Document not found');
@@ -20,18 +31,20 @@ export abstract class Router extends EventEmitter {
         }
     }
 
-    renderAll = (res: restify.Response, next: restify.Next) => {
+    //Callback function to render successful responses
+    renderAll = (res: restify.Response, next: restify.Next, options: any = {}) => {
         return (documents: any[]) => {
             if(documents) {
-                //documents.forEach
-                for (const document of documents) {
+                documents.forEach((document, index, array) => {
                     this.emit('beforeRender', document);
-                }
-                res.json(documents);
+                    array[index] = this.envelope(document);
+                });
+                res.json(this.envelopAll(documents, options));
             }
             else {
-                res.json([]);
+                res.json(this.envelopAll([]));
             }
+            return next();
         }
     }
 }

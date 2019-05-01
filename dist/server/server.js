@@ -56,6 +56,9 @@ class Server {
                 throw new Error(error);
             }
         });
+        this.shutdown = () => __awaiter(this, void 0, void 0, function* () {
+            return mongoose.disconnect().then(() => this.application.close());
+        });
     }
 }
 exports.Server = Server;

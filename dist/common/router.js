@@ -10,7 +10,7 @@ class Router extends events_1.EventEmitter {
             return (document) => {
                 if (document) {
                     this.emit('beforeRender', document);
-                    res.json(document);
+                    res.json(this.envelope(document));
                 }
                 else {
                     throw new restify_errors_1.NotFoundError('Document not found');
@@ -18,20 +18,28 @@ class Router extends events_1.EventEmitter {
                 return next();
             };
         };
-        this.renderAll = (res, next) => {
+        //Callback function to render successful responses
+        this.renderAll = (res, next, options = {}) => {
             return (documents) => {
                 if (documents) {
-                    //documents.forEach
-                    for (const document of documents) {
+                    documents.forEach((document, index, array) => {
                         this.emit('beforeRender', document);
-                    }
-                    res.json(documents);
+                        array[index] = this.envelope(document);
+                    });
+                    res.json(this.envelopAll(documents, options));
                 }
                 else {
-                    res.json([]);
+                    res.json(this.envelopAll([]));
                 }
+                return next();
             };
         };
+    }
+    envelope(document) {
+        return document;
+    }
+    envelopAll(documents, options = {}) {
+        return documents;
     }
 }
 exports.Router = Router;

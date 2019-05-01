@@ -64,4 +64,8 @@ export class Server {
             throw new Error(error)
         }
     }
+
+    shutdown = async () => {
+        return mongoose.disconnect().then(() => this.application.close());
+    }
 }

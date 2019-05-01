@@ -1,0 +1,35 @@
+{
+  "name": "nodejs-restapi",
+  "version": "1.0.0",
+  "description": "A RestAPI built in NodeJS using Restify, CORs, JWT, Mongoose, MongoDB and TypeScript",
+  "main": "jest.config.js",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "mongoose": "^5.5.3",
+    "restify": "^8.3.1",
+    "restify-errors": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.12",
+    "@types/node": "^11.13.8",
+    "@types/supertest": "^2.0.7",
+    "jest": "^24.7.1",
+    "supertest": "^4.0.2",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.4.5"
+  },
+  "scripts": {
+    "testBKP": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andersoncscz/nodejs-restapi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andersoncscz/nodejs-restapi/issues"
+  },
+  "homepage": "https://github.com/andersoncscz/nodejs-restapi#readme"
+}
