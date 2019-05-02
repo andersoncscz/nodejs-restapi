@@ -1,33 +1,15 @@
 import 'jest';
-import * as request from 'supertest';
+import request from 'supertest';
 
-import { Server } from '../server/server';
-import { environment } from '../common/environment';
-import { usersRouter } from './users.router';
-import { User } from './users.model';
-
-let testUrl: string;
-let server: Server;
-
-beforeAll(() => {
-    environment.database.url = process.env.DB_URL || 'mongodb://localhost/node-restapi-test-db'
-    environment.server.port = process.env.SERVER_PORT || 80
-    testUrl = `http://localhost:${environment.server.port}`
-    server = new Server()
-    return server.bootstrap([usersRouter])
-                 .then(() => User.deleteMany({}).exec())
-                 .catch(console.error)
-});
-
-
+let testUrl: string = (<any>global).testURL;
 
 test('get /users', () => {
     return request(testUrl)
         .get('/users')
         .then(response => {
             //Applies matchers:
-            expect(response.status).toBe(200); //Tests Status code 200
-            expect(response.body.data).toBeInstanceOf(Array); //Tests if the property 'data' of response.body is an array
+            expect(response.status).toBe(200);
+            expect(response.body.data).toBeInstanceOf(Array);
         })
         .catch(fail)
 });
@@ -70,8 +52,8 @@ test('patch /users/:id', () => {
     return request(testUrl)
         .post('/users')
         .send({
-            name: 'userPatch5',
-            email: 'userpatch5@hotmail.com',
+            name: 'userToBeUpdated',
+            email: 'usertobeupdated@hotmail.com',
             password: '123456'
         })
         .then(response => request(testUrl)
@@ -83,14 +65,26 @@ test('patch /users/:id', () => {
             expect(response.status).toBe(200);
             expect(response.body._id).toBeDefined();
             expect(response.body.name).toBe('changed');
-            expect(response.body.email).toBe('userpatch5@hotmail.com');
+            expect(response.body.email).toBe('usertobeupdated@hotmail.com');
             expect(response.body.password).toBeUndefined();
         })
         .catch(fail)
-})
+});
 
 
 
-afterAll(() => {
-    return server.shutdown();
+test('del /users/:id', () => {
+    //Tries to add a new user with 'post' and then deletes it using 'del'
+    return request(testUrl)
+        .post('/users')
+        .send({
+            name: 'userToBeDeleted',
+            email: 'usertobedeleted@hotmail.com',
+            password: '123456'
+        })
+        .then(response => request(testUrl).del(`/users/${response.body._id}`))
+        .then(response => {
+            expect(response.status).toBe(204);
+        })
+        .catch(fail)
 });

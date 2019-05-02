@@ -1,10 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const mongoose_1 = __importDefault(require("mongoose"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const environment_1 = require("../common/environment");
 const validator_1 = require("../common/validator");
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose_1.default.Schema({
     name: {
         type: String,
         required: true,
@@ -41,7 +44,7 @@ userSchema.statics.findByEmail = function (email) {
     return this.findOne({ email });
 };
 const hashPassword = (user, next) => {
-    bcrypt.hash(user.password, environment_1.environment.security.saltRounds).then(hash => {
+    bcrypt_1.default.hash(user.password, environment_1.environment.security.saltRounds).then(hash => {
         user.password = hash;
         next();
     })
@@ -57,4 +60,4 @@ const updateMidleware = function (next) {
 userSchema.pre('save', saveMiddleware);
 userSchema.pre('findOneAndUpdate', updateMidleware);
 userSchema.pre('update', updateMidleware);
-exports.User = mongoose.model('User', userSchema);
+exports.User = mongoose_1.default.model('User', userSchema);

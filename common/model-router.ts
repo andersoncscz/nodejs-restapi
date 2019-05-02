@@ -1,11 +1,11 @@
 import { Router } from './router';
 import { NotFoundError } from 'restify-errors';
-import * as mongoose from 'mongoose';
+import mongoose from 'mongoose';
 
 export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     
     basePath: string
-    paginationLimite: number = 2;
+    paginationLimit: number = 2;
 
     constructor(protected model: mongoose.Model<D>) {
         super();
@@ -28,7 +28,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     envelopAll(documents: any[], options: any = {}): any {
         
-        const { page, numberOfRecords, paginationLimite, url } = options;
+        const { page, numberOfRecords, paginationLimit, url } = options;
         //Sets 'self' with the Current url
         const resource: any = {
             _links: {
@@ -37,10 +37,10 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
             data: documents,
         }
 
-        if (page && numberOfRecords && paginationLimite) {
+        if (page && numberOfRecords && paginationLimit) {
             
             //Calculates the total of remaining pages.
-            const remainingToShow = numberOfRecords - (page * paginationLimite);
+            const remainingToShow = numberOfRecords - (page * paginationLimit);
 
             //Creates a link to the previous pagination, only if the current page is higher than 1
             if (page > 1) {
@@ -64,14 +64,14 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         
         //Controls the pagination
         let page: number = parseInt(req.query._page || 1);
-        const skip: number = ((page > 0 ? page : 1) - 1) * this.paginationLimite;
+        const skip: number = ((page > 0 ? page : 1) - 1) * this.paginationLimit;
         
         this.model.countDocuments({}).exec()
             .then(numberOfRecords => {
                 this.model.find()
-                .skip(skip)
-                .limit(this.paginationLimite)
-                .then(this.renderAll(res, next, { page, numberOfRecords, paginationLimite: this.paginationLimite, url: req.url }))
+                        .skip(skip)
+                        .limit(this.paginationLimit)
+                        .then(this.renderAll(res, next, { page, numberOfRecords, paginationLimit: this.paginationLimit, url: req.url }))
             })
             .catch(next);
     }
@@ -111,18 +111,13 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         this.model.findOneAndUpdate(where, req.body, options)
             .then(() => this.model.findById(req.params.id))
             .then(this.render(res, next))
-            .catch(next);   
+            .catch(next);
          
     }
 
     delete = (req, res, next) => {
         this.model.deleteOne({_id: req.params.id}).exec().then(result => {
-            if(result.n) {
-                res.send(204);
-            }
-            else {
-                throw new NotFoundError('Document not found');
-            }
+            result.n ? res.send(204) : next(new NotFoundError('Document not found'));
             next();
         })
         .catch(next);

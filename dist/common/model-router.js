@@ -1,28 +1,31 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const router_1 = require("./router");
 const restify_errors_1 = require("restify-errors");
-const mongoose = require("mongoose");
+const mongoose_1 = __importDefault(require("mongoose"));
 class ModelRouter extends router_1.Router {
     constructor(model) {
         super();
         this.model = model;
-        this.paginationLimite = 2;
+        this.paginationLimit = 2;
         this.prepareOne = (query) => {
             return query;
         };
         //Validates ids
-        this.validateId = (req, res, next) => !mongoose.Types.ObjectId.isValid(req.params.id) ? next(new restify_errors_1.NotFoundError('Document not found')) : next();
+        this.validateId = (req, res, next) => !mongoose_1.default.Types.ObjectId.isValid(req.params.id) ? next(new restify_errors_1.NotFoundError('Document not found')) : next();
         this.find = (req, res, next) => {
             //Controls the pagination
             let page = parseInt(req.query._page || 1);
-            const skip = ((page > 0 ? page : 1) - 1) * this.paginationLimite;
+            const skip = ((page > 0 ? page : 1) - 1) * this.paginationLimit;
             this.model.countDocuments({}).exec()
                 .then(numberOfRecords => {
                 this.model.find()
                     .skip(skip)
-                    .limit(this.paginationLimite)
-                    .then(this.renderAll(res, next, { page, numberOfRecords, paginationLimite: this.paginationLimite, url: req.url }));
+                    .limit(this.paginationLimit)
+                    .then(this.renderAll(res, next, { page, numberOfRecords, paginationLimit: this.paginationLimit, url: req.url }));
             })
                 .catch(next);
         };
@@ -55,12 +58,7 @@ class ModelRouter extends router_1.Router {
         };
         this.delete = (req, res, next) => {
             this.model.deleteOne({ _id: req.params.id }).exec().then(result => {
-                if (result.n) {
-                    res.send(204);
-                }
-                else {
-                    throw new restify_errors_1.NotFoundError('Document not found');
-                }
+                result.n ? res.send(204) : next(new restify_errors_1.NotFoundError('Document not found'));
                 next();
             })
                 .catch(next);
@@ -75,7 +73,7 @@ class ModelRouter extends router_1.Router {
         }, document.toJSON());
     }
     envelopAll(documents, options = {}) {
-        const { page, numberOfRecords, paginationLimite, url } = options;
+        const { page, numberOfRecords, paginationLimit, url } = options;
         //Sets 'self' with the Current url
         const resource = {
             _links: {
@@ -83,9 +81,9 @@ class ModelRouter extends router_1.Router {
             },
             data: documents,
         };
-        if (page && numberOfRecords && paginationLimite) {
+        if (page && numberOfRecords && paginationLimit) {
             //Calculates the total of remaining pages.
-            const remainingToShow = numberOfRecords - (page * paginationLimite);
+            const remainingToShow = numberOfRecords - (page * paginationLimit);
             //Creates a link to the previous pagination, only if the current page is higher than 1
             if (page > 1) {
                 resource._links.previous = `${this.basePath}?_page=${page - 1}`;

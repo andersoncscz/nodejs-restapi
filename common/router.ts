@@ -1,4 +1,4 @@
-import * as restify from 'restify';
+import restify from 'restify';
 import { NotFoundError } from 'restify-errors';
 import { EventEmitter } from 'events';
 

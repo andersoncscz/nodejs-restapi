@@ -1,4 +1,4 @@
-import * as restify from 'restify';
+import restify from 'restify';
 import { BadRequestError } from 'restify-errors';
 
 const mergePatchContentType = 'application/merge-patch+json';

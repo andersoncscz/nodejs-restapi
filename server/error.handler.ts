@@ -1,4 +1,4 @@
-import * as restify from 'restify';
+import restify from 'restify';
 
 export const errorHandler = (req: restify.Request, res: restify.Response, error, callback) => {
     

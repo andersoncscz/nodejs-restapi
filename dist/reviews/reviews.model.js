@@ -1,14 +1,17 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose = require("mongoose");
-const reviewSchema = new mongoose.Schema({
+const mongoose_1 = __importDefault(require("mongoose"));
+const reviewSchema = new mongoose_1.default.Schema({
     restaurant: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'Restaurant',
         required: true
     },
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
@@ -26,4 +29,4 @@ const reviewSchema = new mongoose.Schema({
         maxlength: 500
     }
 });
-exports.Review = mongoose.model('Review', reviewSchema);
+exports.Review = mongoose_1.default.model('Review', reviewSchema);

@@ -7,30 +7,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const restify = require("restify");
-const mongoose = require("mongoose");
+const restify_1 = __importDefault(require("restify"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const environment_1 = require("../common/environment");
 const merge_patch_parser_1 = require("./merge-patch.parser");
 const error_handler_1 = require("./error.handler");
 class Server {
     constructor() {
         this.initDataBase = () => {
-            return mongoose.connect(environment_1.environment.database.url, {
+            return mongoose_1.default.connect(environment_1.environment.database.url, {
                 useNewUrlParser: true
             });
         };
         this.initRouter = (routers) => {
             return new Promise((resolve, reject) => {
                 try {
-                    this.application = restify.createServer({
+                    this.application = restify_1.default.createServer({
                         name: 'node-restify-api',
                         version: '1.0.0'
                     });
                     //Applies the parser for query string
-                    this.application.use(restify.plugins.queryParser());
+                    this.application.use(restify_1.default.plugins.queryParser());
                     //Applies the bodyparser
-                    this.application.use(restify.plugins.bodyParser());
+                    this.application.use(restify_1.default.plugins.bodyParser());
                     //Applies the bodyparser transform for patch methods
                     this.application.use(merge_patch_parser_1.mergePatchBodyParser);
                     //Applies a callback function for handle errors
@@ -57,7 +60,7 @@ class Server {
             }
         });
         this.shutdown = () => __awaiter(this, void 0, void 0, function* () {
-            return mongoose.disconnect().then(() => this.application.close());
+            return mongoose_1.default.disconnect().then(() => this.application.close());
         });
     }
 }

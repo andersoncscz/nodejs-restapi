@@ -1,4 +1,4 @@
-import * as restify from 'restify';
+import restify from 'restify';
 
 import { Restaurant } from './restaurants.model';
 import { ModelRouter } from '../common/model-router';

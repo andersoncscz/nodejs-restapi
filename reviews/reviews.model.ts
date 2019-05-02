@@ -1,4 +1,4 @@
-import * as mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import { Restaurant } from '../restaurants/restaurants.model';
 import { User } from '../users/users.model';
 
