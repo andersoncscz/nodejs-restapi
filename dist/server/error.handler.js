@@ -13,7 +13,7 @@ exports.errorHandler = (req, res, error, callback) => {
             for (const key in error.errors) {
                 messages.push({ message: error.errors[key].message });
             }
-            error.toJSON = () => ({ errors: messages });
+            error.toJSON = () => ({ message: 'Validation error caught while processing your request', errors: messages });
             break;
         default:
             break;

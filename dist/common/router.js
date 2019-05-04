@@ -15,7 +15,7 @@ class Router extends events_1.EventEmitter {
                 else {
                     throw new restify_errors_1.NotFoundError('Document not found');
                 }
-                return next();
+                return next(false);
             };
         };
         //Callback function to render successful responses
@@ -31,7 +31,7 @@ class Router extends events_1.EventEmitter {
                 else {
                     res.json(this.envelopAll([]));
                 }
-                return next();
+                return next(false);
             };
         };
     }

@@ -11,11 +11,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs_1 = __importDefault(require("fs"));
 const restify_1 = __importDefault(require("restify"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const environment_1 = require("../common/environment");
 const merge_patch_parser_1 = require("./merge-patch.parser");
 const error_handler_1 = require("./error.handler");
+const token_parser_1 = require("../security/token.parser");
 class Server {
     constructor() {
         this.initDataBase = () => {
@@ -26,16 +28,23 @@ class Server {
         this.initRouter = (routers) => {
             return new Promise((resolve, reject) => {
                 try {
-                    this.application = restify_1.default.createServer({
+                    const options = {
                         name: 'node-restify-api',
-                        version: '1.0.0'
-                    });
+                        version: '1.0.0',
+                    };
+                    if (environment_1.environment.security.enableHTTPS) {
+                        options.certificate = fs_1.default.readFileSync(environment_1.environment.security.certificate),
+                            options.key = fs_1.default.readFileSync(environment_1.environment.security.key);
+                    }
+                    this.application = restify_1.default.createServer(options);
                     //Applies the parser for query string
                     this.application.use(restify_1.default.plugins.queryParser());
                     //Applies the bodyparser
                     this.application.use(restify_1.default.plugins.bodyParser());
                     //Applies the bodyparser transform for patch methods
                     this.application.use(merge_patch_parser_1.mergePatchBodyParser);
+                    //Applies the token parser middleware
+                    this.application.use(token_parser_1.tokenParser);
                     //Applies a callback function for handle errors
                     this.application.on('restifyError', error_handler_1.errorHandler);
                     //Applies all routes of each router.

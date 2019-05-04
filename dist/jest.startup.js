@@ -14,19 +14,33 @@ const restaurants_router_1 = require("./restaurants/restaurants.router");
 const restaurants_model_1 = require("./restaurants/restaurants.model");
 let server;
 const beforeAllTests = () => {
-    //Creates a new server for testing, with a db test and using other port
+    //Creates a new server for testing with a new port and database
     environment_1.environment.database.url = process.env.DB_URL || 'mongodb://localhost/node-restapi-test-db';
-    environment_1.environment.server.port = process.env.SERVER_PORT || 80;
+    environment_1.environment.server.port = process.env.SERVER_PORT || 3001;
     server = new server_1.Server();
     return server.bootstrap([
         users_router_1.usersRouter,
         restaurants_router_1.restaurantsRouter,
         reviews_router_1.reviewsRouter
-    ]) //Cleans up before initilizing
-        .then(() => users_model_1.User.deleteMany({}).exec())
-        .then(() => reviews_model_1.Review.deleteMany({}).exec())
-        .then(() => restaurants_model_1.Restaurant.deleteMany({}).exec())
+    ])
+        .then(() => {
+        //Cleans up before initializing
+        Promise.all([
+            users_model_1.User.deleteMany({}).exec(),
+            registerNewUser(),
+            reviews_model_1.Review.deleteMany({}).exec(),
+            restaurants_model_1.Restaurant.deleteMany({}).exec()
+        ]);
+    })
         .catch(console.error);
+};
+const registerNewUser = () => {
+    let admin = new users_model_1.User;
+    admin.name = 'Anderson Cruz';
+    admin.email = 'andersoncscz@hotmail.com';
+    admin.password = '123changeit';
+    admin.profiles = ['admin', 'user'];
+    return admin.save();
 };
 const afterAllTests = () => {
     //Shutdown the test server

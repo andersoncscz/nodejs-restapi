@@ -38,10 +38,21 @@ const userSchema = new mongoose_1.default.Schema({
             validator: validator_1.validateCPF,
             message: '{PATH}: Invalid CPF. ({VALUE})',
         }
+    },
+    profiles: {
+        type: [String],
+        required: false,
+        enum: ['admin', 'user']
     }
 });
-userSchema.statics.findByEmail = function (email) {
-    return this.findOne({ email });
+userSchema.statics.findByEmail = function (email, projection) {
+    return this.findOne({ email }, projection);
+};
+userSchema.methods.matches = function (password) {
+    return bcrypt_1.default.compareSync(password, this.password);
+};
+userSchema.methods.hasAny = function (...profiles) {
+    return profiles.some(profile => this.profiles.indexOf(profile) !== -1);
 };
 const hashPassword = (user, next) => {
     bcrypt_1.default.hash(user.password, environment_1.environment.security.saltRounds).then(hash => {
