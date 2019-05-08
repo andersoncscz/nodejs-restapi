@@ -7,6 +7,7 @@ import { Router } from '../common/router';
 import { mergePatchBodyParser } from './merge-patch.parser';
 import { errorHandler } from './error.handler';
 import { tokenParser } from '../security/token.parser';
+import { logger } from '../common/logger';
 
 export class Server {
 
@@ -28,6 +29,7 @@ export class Server {
                 const options: restify.ServerOptions = {
                     name: 'node-restify-api',
                     version: '1.0.0',
+                    log: logger
                 }
 
                 if(environment.security.enableHTTPS) {
@@ -37,6 +39,9 @@ export class Server {
 
                 this.application = restify.createServer(options);
                 
+                //Applies a request logger
+                this.application.pre(restify.plugins.requestLogger({ log: logger }));
+
                 //Applies the parser for query string
                 this.application.use(restify.plugins.queryParser());
                 
@@ -51,6 +56,9 @@ export class Server {
 
                 //Applies a callback function for handle errors
                 this.application.on('restifyError', errorHandler);
+
+                //Applies the restify audit logger. events: pre, routed, or after.
+                this.application.on('after', restify.plugins.auditLogger({ log: logger, event: 'after' }));
 
                 //Applies all routes of each router.
                 for (const router of routers) {

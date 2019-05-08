@@ -12,4 +12,9 @@ export const environment = {
         certificate: process.env.CERTIFICATE_FILE || './security/keys/cert.pem',
         key: process.env.CERTIFICATE_KEY_FILE || './security/keys/key.pem'
     },
+
+    log: {
+        level: process.env.LOG_LEVEL || 'debug',
+        name: 'nodejs-restapi-logger'
+    }
 }

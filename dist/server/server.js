@@ -18,6 +18,7 @@ const environment_1 = require("../common/environment");
 const merge_patch_parser_1 = require("./merge-patch.parser");
 const error_handler_1 = require("./error.handler");
 const token_parser_1 = require("../security/token.parser");
+const logger_1 = require("../common/logger");
 class Server {
     constructor() {
         this.initDataBase = () => {
@@ -31,12 +32,15 @@ class Server {
                     const options = {
                         name: 'node-restify-api',
                         version: '1.0.0',
+                        log: logger_1.logger
                     };
                     if (environment_1.environment.security.enableHTTPS) {
                         options.certificate = fs_1.default.readFileSync(environment_1.environment.security.certificate),
                             options.key = fs_1.default.readFileSync(environment_1.environment.security.key);
                     }
                     this.application = restify_1.default.createServer(options);
+                    //Applies a request logger
+                    this.application.pre(restify_1.default.plugins.requestLogger({ log: logger_1.logger }));
                     //Applies the parser for query string
                     this.application.use(restify_1.default.plugins.queryParser());
                     //Applies the bodyparser
@@ -47,6 +51,8 @@ class Server {
                     this.application.use(token_parser_1.tokenParser);
                     //Applies a callback function for handle errors
                     this.application.on('restifyError', error_handler_1.errorHandler);
+                    //Applies the restify audit logger. events: pre, routed, or after.
+                    this.application.on('after', restify_1.default.plugins.auditLogger({ log: logger_1.logger, event: 'after' }));
                     //Applies all routes of each router.
                     for (const router of routers) {
                         router.applyRoutes(this.application);
