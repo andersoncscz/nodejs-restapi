@@ -39,7 +39,7 @@ class UsersRouter extends ModelRouter<User> {
         //Applies authorize method which is responsible to check if some profile is allow to access some route
         application.get(`${this.basePath}`, [authorize('admin'), this.findByEmail, this.find]);
         application.get(`${this.basePath}/:id`, [authorize('admin'), this.validateId, this.findById]);
-        application.post(`${this.basePath}`, [authorize('admin'), this.save]);
+        application.post(`${this.basePath}`, this.save);
         application.put(`${this.basePath}/:id`, [authorize('admin', 'user'), this.validateChanges, this.validateId, this.replace]);
         application.patch(`${this.basePath}/:id`, [authorize('admin', 'user'), this.validateChanges, this.validateId, this.update]);
         application.del(`${this.basePath}/:id`, [authorize('admin'), this.validateId, this.delete]);
