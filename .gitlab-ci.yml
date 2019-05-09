@@ -1,19 +1,22 @@
+# Stages to be executed
 stages:
   - test
 
+#Caching node_modules
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
     - node_modules/
 
+#Stage 'test' configuration
 test:
   stage: test
-  image: nikolaik/python-nodejs
+  image: nikolaik/python-nodejs:latest #A docker image with currently versions of nodejs and python.
   variables:
     SERVER_PORT: 3001
     DB_URL: "mongodb://mongo/nodejs-restify-db"
   services:
-    - mongo
-  script:
+    - mongo #Use mongo service from gitlab
+  script: #Scripts that will be executed.
     - npm i
     - npm test
