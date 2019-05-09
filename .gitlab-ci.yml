@@ -1,6 +1,7 @@
 # Stages to be executed
 stages:
   - test
+  - deploy
 
 #Caching node_modules
 cache:
@@ -8,7 +9,7 @@ cache:
   paths:
     - node_modules/
 
-#Stage 'test' configuration
+#Job 'test' configuration
 test:
   stage: test
   image: nikolaik/python-nodejs:latest #A docker image with currently versions of nodejs and python.
@@ -20,3 +21,24 @@ test:
   script: #Scripts that will be executed.
     - npm i
     - npm test
+
+#Deploy
+deploy:
+  stage: deploy
+  image: rastasheep/ubuntu-sshd
+  before_script:
+    - mkdir -p ~/.ssh #Creates a new directory
+    - echo "$DEPLOY_KEY" | tr -d '\r' > ~/.ssh/id_rsa #Gets the key from 'DEPLOY_KEY' setup on gitlab in: .../settings/ci_cd/variables, and passes it to id_rsa file
+    - chmod 600 ~/.ssh/id_rsa #Allows the id_rsa file to be read.
+    - eval "$(ssh-agent -s)" #Associates the key with the ssh-agent
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts #Scan the 'DEPLOY_SERVER' setup on gitlab in: .../settings/ci_cd/variables, and set it to the known hosts.
+  script:
+    - ssh deploy@$DEPLOY_SERVER "source ~/.nvm/nvm.sh; cd nodejs-restapi; git pull; npm i; npm run build; cd; pm2 startOrReload ecosystem.config.js"
+    #Runs the script above:
+      # - Get in the project folder
+      # - Pull the repository from gitlab.
+      # - Install dependencies from package.json using npm i
+      # - Run build command using npm build, to build typescripts into javascript using tsc
+      # - Get back to the previous folder
+      # - Start ou Reload the application using pm2
