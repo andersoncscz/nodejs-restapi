@@ -25,7 +25,7 @@ test:
 #Deploy
 deploy:
   stage: deploy
-  image: rastasheep/ubuntu-sshd
+  image: rastasheep/ubuntu-sshd:18.04
   before_script:
     - mkdir -p ~/.ssh #Creates a new directory
     - echo "$DEPLOY_KEY" | tr -d '\r' > ~/.ssh/id_rsa #Gets the key from 'DEPLOY_KEY' setup on gitlab in: .../settings/ci_cd/variables, and passes it to id_rsa file
