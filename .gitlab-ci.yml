@@ -7,7 +7,7 @@ stages:
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
-    - node_modules/
+    - nodejs-restapi/node_modules/
 
 #Job 'test' configuration
 test:
