@@ -1,15 +1,13 @@
 # nodejs-restapi
-A RestAPI built in NodeJS using Restify, Nodemon, PM2, CORs, JWT, Mongoose, MongoDB, Jest and TypeScript.
-Features working: 
+A RestAPI built in NodeJS using Restify, Nodemon, PM2, CORS, JWT, Mongoose, MongoDB, Jest and TypeScript.
+Features: 
 - Hypermidia
 - HTTPS protocol enabled.
-- Profiles rules for users
+- Access according with profile rules for users
 - JWT
-- PM2 in cluster mode.
+- PM2 cluster mode enabled.
 - Logging with Restify and PM2.
 - Tests with Jest.
+- CI/CD.
 
-Features to be developed;
-- Hypermidia for root url.
-- Create more tests with Jest
-- Enable CORs
+The API address: https://andersoncsczdev.com/api/
