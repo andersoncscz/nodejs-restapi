@@ -5,6 +5,7 @@ Features:
 - HTTPS protocol enabled.
 - Access according with profile rules for users
 - JWT
+- bcrypt
 - CORS
 - PM2 cluster mode enabled.
 - Logging with Restify and PM2.

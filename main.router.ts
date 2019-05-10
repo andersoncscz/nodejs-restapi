@@ -6,7 +6,10 @@ class MainRouter extends Router {
         application.get('/', (req, res, next) => {
             res.json({
                 _links: {
-                    users: `${this.baseUrl}/users`,
+                    users: {
+                        users: `${this.baseUrl}/users`,
+                        authentication: `${this.baseUrl}/users/authenticate`,
+                    },
                     restaurants: `${this.baseUrl}/restaurants`,
                     reviews: `${this.baseUrl}/reviews`,
                 },
