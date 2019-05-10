@@ -4,6 +4,8 @@ import { EventEmitter } from 'events';
 
 export abstract class Router extends EventEmitter {
     
+    baseUrl: string = 'http://localhost:5000';
+
     abstract applyRoutes(application: restify.Server);
     
 

@@ -13,12 +13,14 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.5.5",
     "restify": "^8.3.1",
+    "restify-cors-middleware": "^1.1.1",
     "restify-errors": "^7.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
     "@types/jest": "^24.0.12",
     "@types/jsonwebtoken": "^8.3.2",
+    "@types/restify-cors-middleware": "^1.0.1",
     "@types/supertest": "^2.0.7",
     "jest": "^24.7.1",
     "supertest": "^4.0.2",

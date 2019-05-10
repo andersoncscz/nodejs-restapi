@@ -22,7 +22,7 @@ let server: Server;
 const beforeAllTests = () => {
     //Creates a new server for testing with a new port and database
     environment.database.url = process.env.DB_URL || 'mongodb://localhost/node-restapi-test-db'
-    environment.server.port = process.env.SERVER_PORT || 3001
+    environment.server.port = process.env.SERVER_PORT || 5001
     
     server = new Server()
     return server.bootstrap([

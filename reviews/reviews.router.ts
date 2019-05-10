@@ -20,7 +20,7 @@ class ReviewsRouter extends ModelRouter<Review> {
     envelope(document) {
         const restaurantId = document.restaurant._id ? document.restaurant._id : document.restaurant;
         let resource = super.envelope(document);
-        resource._links.restaurant = `/restaurants/${restaurantId}/menu`;
+        resource._links.restaurant = `${this.baseUrl}/restaurants/${restaurantId}`;
         return resource;
     }
 

@@ -4,8 +4,8 @@ import mongoose from 'mongoose';
 
 export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     
-    basePath: string
-    paginationLimit: number = 2;
+    basePath: string;
+    paginationLimit: number = 10;
 
     constructor(protected model: mongoose.Model<D>) {
         super();
@@ -19,7 +19,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     envelope(document: any): any {
         return Object.assign({
             _links: {
-                self: `${this.basePath}/${document._id}`
+                self: `${this.baseUrl + this.basePath}/${document._id}`
             }},
             document.toJSON()
         );
@@ -28,11 +28,11 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     envelopAll(documents: any[], options: any = {}): any {
         
-        const { page, numberOfRecords, paginationLimit, url } = options;
+        const { page, numberOfRecords, paginationLimit } = options;
         //Sets 'self' with the Current url
         const resource: any = {
             _links: {
-                self: `${url}`,
+                self: `${this.baseUrl + this.basePath}`,
             },            
             data: documents,
         }
@@ -44,12 +44,12 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
             //Creates a link to the previous pagination, only if the current page is higher than 1
             if (page > 1) {
-                resource._links.previous = `${this.basePath}?_page=${page - 1}`;
+                resource._links.previous = `${this.baseUrl + this.basePath}?_page=${page - 1}`;
             }
             
             //Creates a link to the next pagination, only if there's still data to show.
             if (remainingToShow > 0) {
-                resource._links.next = `${this.basePath}?_page=${page + 1}`;
+                resource._links.next = `${this.baseUrl + this.basePath}?_page=${page + 1}`;
             }
         }
         return resource;
@@ -71,7 +71,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
                 this.model.find()
                         .skip(skip)
                         .limit(this.paginationLimit)
-                        .then(this.renderAll(res, next, { page, numberOfRecords, paginationLimit: this.paginationLimit, url: req.url }))
+                        .then(this.renderAll(res, next, { page, numberOfRecords, paginationLimit: this.paginationLimit }))
             })
             .catch(next);
     }

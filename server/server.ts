@@ -1,5 +1,6 @@
 import fs from 'fs';
 import restify from 'restify'
+import corsMiddleware from 'restify-cors-middleware';
 import mongoose from 'mongoose';
 
 import { environment } from '../common/environment';
@@ -32,15 +33,32 @@ export class Server {
                     log: logger
                 }
 
+                
+                const corsOptions: corsMiddleware.Options = {
+                    preflightMaxAge: 86400, //Caches the preflight request for 1 day (86400), it's avoid making preflight requests everytime.
+                    origins: ['*'], //All origins allowed in this example.
+                    allowHeaders: ['authorization'], //for JWT
+                    exposeHeaders: ['x-custom-header'] //Exposes to client our custom headers, if we have any. It's only an example.
+                }        
+                
+                const cors: corsMiddleware.CorsMiddleware = corsMiddleware(corsOptions);
+
                 if(environment.security.enableHTTPS) {
                     options.certificate = fs.readFileSync(environment.security.certificate),
                     options.key = fs.readFileSync(environment.security.key)
                 }
 
+                //Creates the server instance.
                 this.application = restify.createServer(options);
-                
+
+                //Applies CORs for preflight requests.
+                this.application.pre(cors.preflight)
+
                 //Applies a request logger
                 this.application.pre(restify.plugins.requestLogger({ log: logger }));
+
+                //Applies CORs for valid routes.
+                this.application.use(cors.actual)
 
                 //Applies the parser for query string
                 this.application.use(restify.plugins.queryParser());
@@ -86,6 +104,7 @@ export class Server {
     }
 
     shutdown = async () => {
-        return mongoose.disconnect().then(() => this.application.close());
+        await mongoose.disconnect();
+        return this.application.close();
     }
 }
