@@ -5,9 +5,10 @@ Features:
 - HTTPS protocol enabled.
 - Access according with profile rules for users
 - JWT
+- CORS
 - PM2 cluster mode enabled.
 - Logging with Restify and PM2.
 - Tests with Jest.
 - CI/CD.
 
-The API address: https://andersoncsczdev.com/api/
+API address: https://andersoncsczdev.com/api/
